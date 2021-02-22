@@ -4,8 +4,14 @@ import {
   TextInput,
   Button,
   ActivityIndicator,
+  Text,
 } from "react-native";
 import { Formik } from "formik";
+import * as yup from "yup";
+
+const validationSchema = yup.object().shape({
+  name: yup.string().required().label("Name").min(2, "asdf").max(5, "asdf"),
+});
 
 export default () => (
   <SafeAreaView style={{ marginTop: 90 }}>
@@ -17,6 +23,7 @@ export default () => (
           actions.setSubmitting(false);
         }, 1000);
       }}
+      validationSchema={validationSchema}
     >
       {(formikProps) => (
         <React.Fragment>
@@ -29,6 +36,7 @@ export default () => (
             }}
             onChangeText={formikProps.handleChange("name")}
           />
+          <Text style={{ color: "red" }}>{formikProps.errors.name}</Text>
           {formikProps.isSubmitting ? (
             <ActivityIndicator />
           ) : (
