@@ -1,21 +1,41 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react";
+import {
+  SafeAreaView,
+  TextInput,
+  Button,
+  ActivityIndicator,
+} from "react-native";
+import { Formik } from "formik";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default () => (
+  <SafeAreaView style={{ marginTop: 90 }}>
+    <Formik
+      initialValues={{ name: "" }}
+      onSubmit={(values, actions) => {
+        alert(JSON.stringify(values));
+        setTimeout(() => {
+          actions.setSubmitting(false);
+        }, 1000);
+      }}
+    >
+      {(formikProps) => (
+        <React.Fragment>
+          <TextInput
+            style={{
+              borderWidth: 1,
+              borderColor: "black",
+              padding: 10,
+              marginBottom: 3,
+            }}
+            onChangeText={formikProps.handleChange("name")}
+          />
+          {formikProps.isSubmitting ? (
+            <ActivityIndicator />
+          ) : (
+            <Button title="Submit" onPress={formikProps.handleSubmit} />
+          )}
+        </React.Fragment>
+      )}
+    </Formik>
+  </SafeAreaView>
+);
