@@ -12,6 +12,16 @@ import { Formik } from "formik";
 import * as yup from "yup";
 
 // Components
+const FieldWrapper = ({ children, label, formikProps, formikKey }) => (
+  <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
+    <Text style={{ marginBottom: 3 }}>{label}</Text>
+    {children}
+    <Text style={{ color: "red" }}>
+      {formikProps.touched[formikKey] && formikProps.errors[formikKey]}
+    </Text>
+  </View>
+);
+
 const StyledInput = ({ label, formikProps, formikKey, ...rest }) => {
   const inputStyles = {
     borderWidth: 1,
@@ -25,25 +35,20 @@ const StyledInput = ({ label, formikProps, formikKey, ...rest }) => {
   }
 
   return (
-    <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
-      <Text style={{ marginBottom: 3 }}>{label}</Text>
+    <FieldWrapper label={label} formikKey={formikKey} formikProps={formikProps}>
       <TextInput
         style={inputStyles}
         onChangeText={formikProps.handleChange(formikKey)}
         onBlur={formikProps.handleBlur(formikKey)}
         {...rest}
       />
-      <Text style={{ color: "red" }}>
-        {formikProps.touched[formikKey] && formikProps.errors[formikKey]}
-      </Text>
-    </View>
+    </FieldWrapper>
   );
 };
 
 const StyledSwitch = ({ formikKey, formikProps, label, ...rest }) => {
   return (
-    <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
-      <Text style={{ marginBottom: 3 }}>{label}</Text>
+    <FieldWrapper label={label} formikKey={formikKey} formikProps={formikProps}>
       <Switch
         value={formikProps.values[formikKey]}
         onValueChange={(value) => {
@@ -51,10 +56,7 @@ const StyledSwitch = ({ formikKey, formikProps, label, ...rest }) => {
         }}
         {...rest}
       />
-      <Text style={{ color: "red" }}>
-        {formikProps.touched[formikKey] && formikProps.errors[formikKey]}
-      </Text>
-    </View>
+    </FieldWrapper>
   );
 };
 
@@ -68,6 +70,13 @@ const validationSchema = yup.object().shape({
     .required()
     .min(2, "Seems a bit short...")
     .max(10, "We prefer insecure systems, try a shorter password."),
+  confirmPassword: yup
+    .string()
+    .label("Confirm Password")
+    .required()
+    .test("passwords-match", "Passwords must match ya fool", function (value) {
+      return this.parent.password === value;
+    }),
   agreeToTerms: yup
     .boolean()
     .label("Terms")
@@ -79,7 +88,12 @@ const validationSchema = yup.object().shape({
 export default () => (
   <SafeAreaView style={{ marginTop: 90 }}>
     <Formik
-      initialValues={{ email: "", password: "", agreeToTerms: false }}
+      initialValues={{
+        email: "",
+        password: "",
+        confirmPassword: "",
+        agreeToTerms: false,
+      }}
       onSubmit={(values, actions) => {
         alert(JSON.stringify(values));
         setTimeout(() => {
@@ -103,6 +117,14 @@ export default () => (
             formikProps={formikProps}
             formikKey="password"
             placeholder="Password"
+            secureTextEntry
+          />
+
+          <StyledInput
+            label="Confirm Password"
+            formikProps={formikProps}
+            formikKey="confirmPassword"
+            placeholder="Confirm Password"
             secureTextEntry
           />
 
